@@ -50,3 +50,28 @@ A **Filter node** removes campaigns where **date_start** is `null`, which usuall
   "date_start": null,
   "date_stop": null
 }
+
+
+## 🗄️ 5. Append to PostgreSQL Database (Supabase)
+
+After collecting and cleaning the data, the workflow executes an SQL query to append the results to the existing PostgreSQL table hosted in Supabase.
+
+**PostgreSQL Table Fields**
+- `id` – Primary key used to uniquely identify each appended record  
+- `date_added` – Timestamp indicating when the record was inserted  
+
+**Example Stored Record**
+
+```json
+{
+  "id": 1,
+  "campaign_id": "12024123121231234",
+  "campaign_name": "Learn Python with our Course",
+  "spend": "10.5",
+  "impressions": "1234",
+  "clicks": "10",
+  "account_id": "11112222333344",
+  "date_start": "2026-02-07",
+  "date_stop": "2026-02-09",
+  "date_added": "2026-02-09T10:50:15Z"
+}
