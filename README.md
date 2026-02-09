@@ -50,7 +50,7 @@ A **Filter node** removes campaigns where **date_start** is `null`, which usuall
   "date_start": null,
   "date_stop": null
 }
-
+```
 
 ## 🗄️ 5. Append to PostgreSQL Database (Supabase)
 
@@ -75,3 +75,4 @@ After collecting and cleaning the data, the workflow executes an SQL query to ap
   "date_stop": "2026-02-09",
   "date_added": "2026-02-09T10:50:15Z"
 }
+```
