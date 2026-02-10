@@ -1,5 +1,5 @@
 
 .env
 .venv
-main.py
 requirements.txt
+main.py

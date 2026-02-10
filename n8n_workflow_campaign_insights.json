@@ -1,0 +1,1936 @@
+{
+  "name": "campaign insights",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 170
+            }
+          ]
+        }
+      },
+      "id": "84a7d833-b066-484f-88ed-0ee1dc9cc3b3",
+      "name": "Schedule Trigger4",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        2240,
+        1376
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "=Meta credential",
+          "mode": "name"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "expires_at": "={{ $('My Token').item.json.expires_at }}",
+            "Token": "={{ $('My Token').item.json.Token }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Token",
+              "displayName": "Token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "expires_at",
+              "displayName": "expires_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "aab237ef-e6a7-49b1-99ea-7fc44965e841",
+      "name": "Update Record3",
+      "type": "n8n-nodes-base.dataTable",
+      "position": [
+        2912,
+        896
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 170
+            }
+          ]
+        }
+      },
+      "id": "d326218f-d0b1-4223-808d-3097e190a460",
+      "name": "Create Table",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        2240,
+        896
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "Meta credential",
+        "columns": {
+          "column": [
+            {
+              "name": "=Token"
+            },
+            {
+              "name": "=expires_at",
+              "type": "date"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b91e8ca9-85c1-43a8-a1b1-cc6521c3d61a",
+      "name": "Create Table1",
+      "type": "n8n-nodes-base.dataTable",
+      "position": [
+        2688,
+        896
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v20.0/oauth/access_token",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "fb_exchange_token"
+            },
+            {
+              "name": "client_id",
+              "value": "1940327043583326"
+            },
+            {
+              "name": "client_secret",
+              "value": "658daa7de63fa1d5a85643e42a14e4fc"
+            },
+            {
+              "name": "fb_exchange_token",
+              "value": "={{ $json.Token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "541b553c-b730-400b-b685-9b1322dfc294",
+      "name": "Reniew token (60 days)",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2864,
+        1696
+      ],
+      "typeVersion": 4.2,
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d944ea03-bfd1-43ca-ad7b-bdb4974b877a",
+              "name": "Token",
+              "value": "={{ $json.Token }}",
+              "type": "string"
+            },
+            {
+              "id": "fe8e170b-8b3b-4062-a83a-8a4a831d1ecf",
+              "name": "expires_at",
+              "value": "={{ $json.expires_at }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        896
+      ],
+      "id": "3406f3a7-fe1d-4d2a-86d5-19a02c8911b5",
+      "name": "My Token"
+    },
+    {
+      "parameters": {
+        "content": "# Using HTTP Request Node - step 1\n\n",
+        "height": 336,
+        "width": 2656,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2176,
+        784
+      ],
+      "typeVersion": 1,
+      "id": "c8709a04-3563-49f6-9e5e-51d033521520",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6b363737-83d2-42d6-9e00-b9bc88377495",
+              "name": "new_expires_in",
+              "value": "={{ new Date(Date.now() + ($json.body.expires_in * 1000) - (24 * 60 * 60 * 1000)).toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "57336b7e-3a3d-47a4-a0d3-330aa476be57",
+              "name": "new_access_token",
+              "value": "={{ $json.body.access_token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3088,
+        1696
+      ],
+      "id": "d6d0624d-195c-4c35-96a9-971937db0c98",
+      "name": "Token generated"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "SPe3p1gt6s2tWvb2",
+          "mode": "list",
+          "cachedResultName": "Meta credential",
+          "cachedResultUrl": "/projects/6uW3FuTwSyIY5b6c/datatables/SPe3p1gt6s2tWvb2"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "expires_at": "={{ $json.new_expires_in }}",
+            "Token": "={{ $json.new_access_token }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Token",
+              "displayName": "Token",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "expires_at",
+              "displayName": "expires_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3312,
+        1696
+      ],
+      "id": "56958b8f-4655-4cca-9baf-101fc0162447",
+      "name": "Update token"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0fe9d927-f498-4263-bc67-822998038e38",
+                    "leftValue": "={{ new Date($json.expires_at) <= new Date() }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ new Date($json.expires_at) <= new Date() }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "c9b76cd5-339e-4e06-81e7-4b3b0fcf4eaa"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Yes"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        1376
+      ],
+      "id": "68cdde95-49c6-44d1-a34d-a4c1188ed3d9",
+      "name": "Token expired"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "=Meta credential v2",
+          "mode": "name"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "id": "d7cfb075-8211-4ce7-94a2-52cc6a0d9cd4",
+      "name": "Check token expiration date",
+      "type": "n8n-nodes-base.dataTable",
+      "position": [
+        2464,
+        1376
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 170
+            }
+          ]
+        }
+      },
+      "id": "90852e94-30af-4d9d-84b1-4bea3f74402f",
+      "name": "Schedule Trigger5",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        2240,
+        304
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2688,
+        304
+      ],
+      "id": "90780862-93a2-4123-b59e-d79e7fcf0e9e",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2912,
+        304
+      ],
+      "id": "a86d7a74-4097-4774-940a-8e896ae4c1bc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3568,
+        464
+      ],
+      "id": "3780d9fb-f599-458e-916a-b03cdd808139",
+      "name": "Wait",
+      "webhookId": "b7dbd202-4207-4547-8979-a743dc75821b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d35d80b2-d1c3-4f59-913e-bad238ccf0d0",
+              "name": "campaign_id",
+              "value": "={{ $('Split Out3').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "646457b6-590e-4ea4-875e-2caa724f51f7",
+              "name": "campaign_name",
+              "value": "={{ $('Split Out3').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "35fedc82-8276-4fd5-bac3-5c42fcbc343d",
+              "name": "spend",
+              "value": "={{ $json.data[0].spend }}",
+              "type": "string"
+            },
+            {
+              "id": "fb95dcbd-cbbe-47b5-a2a0-f7b2863ce243",
+              "name": "impressions",
+              "value": "={{ $json.data[0].impressions }}",
+              "type": "string"
+            },
+            {
+              "id": "13cc352c-cd73-492d-84d1-839c22256feb",
+              "name": "clicks",
+              "value": "={{ $json.data[0].clicks }}",
+              "type": "string"
+            },
+            {
+              "id": "d0c6d2ff-3835-4b34-831e-a8b5a168a38a",
+              "name": "account_id",
+              "value": "={{ $('Split Out3').item.json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "11d74e43-f288-49e4-a09d-94c8f0a838c1",
+              "name": "date_start",
+              "value": "={{ $json.data[0].date_start }}",
+              "type": "string"
+            },
+            {
+              "id": "1d24aa1d-9dbb-4215-bfa3-a51635017e3e",
+              "name": "date_stop",
+              "value": "={{ $json.data[0].date_stop }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3344,
+        464
+      ],
+      "id": "ba96c594-bc69-4d9e-a3a2-182aa5720105",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2409e878-11e5-4b88-8acf-6a13f8482adf",
+              "leftValue": "={{ $json.date_start }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        3120,
+        288
+      ],
+      "id": "458f6750-6c81-4437-bf9a-eb26473fb769",
+      "name": "Filter2"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "meta_ads_campaign_insights",
+          "mode": "list",
+          "cachedResultName": "meta_ads_campaign_insights"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "spend": "={{ $json.spend }}",
+            "impressions": "={{ $json.impressions }}",
+            "clicks": "={{ $json.clicks }}",
+            "campaign_id": "={{ $json.campaign_id }}",
+            "campaign_name": "={{ $json.campaign_name }}",
+            "account_id": "={{ $json.account_id }}",
+            "date_start": "={{ $json.date_start }}",
+            "date_stop": "={{ $json.date_stop }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "campaign_id",
+              "displayName": "campaign_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "campaign_name",
+              "displayName": "campaign_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "spend",
+              "displayName": "spend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "impressions",
+              "displayName": "impressions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clicks",
+              "displayName": "clicks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "account_id",
+              "displayName": "account_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_start",
+              "displayName": "date_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_stop",
+              "displayName": "date_stop",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_added",
+              "displayName": "date_added",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3344,
+        288
+      ],
+      "id": "0d97bc7b-ae53-4317-92e1-cfdddff4992c",
+      "name": "Add to database",
+      "credentials": {
+        "postgres": {
+          "id": "705f6HFlnUytjJ4R",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3136,
+        1184
+      ],
+      "id": "53b85b52-9c0b-45a0-8ddd-dbc397f5287f",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3360,
+        1184
+      ],
+      "id": "2d3db377-5314-4b10-b9fb-161a8824aade",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d35d80b2-d1c3-4f59-913e-bad238ccf0d0",
+              "name": "campaign_id",
+              "value": "={{ $('Split Out4').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "646457b6-590e-4ea4-875e-2caa724f51f7",
+              "name": "campaign_name",
+              "value": "={{ $('Split Out4').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "35fedc82-8276-4fd5-bac3-5c42fcbc343d",
+              "name": "spend",
+              "value": "={{ $json.data[0].spend }}",
+              "type": "string"
+            },
+            {
+              "id": "fb95dcbd-cbbe-47b5-a2a0-f7b2863ce243",
+              "name": "impressions",
+              "value": "={{ $json.data[0].impressions }}",
+              "type": "string"
+            },
+            {
+              "id": "13cc352c-cd73-492d-84d1-839c22256feb",
+              "name": "clicks",
+              "value": "={{ $json.data[0].clicks }}",
+              "type": "string"
+            },
+            {
+              "id": "d0c6d2ff-3835-4b34-831e-a8b5a168a38a",
+              "name": "account_id",
+              "value": "={{ $('Split Out4').item.json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "11d74e43-f288-49e4-a09d-94c8f0a838c1",
+              "name": "date_start",
+              "value": "={{ $json.data[0].date_start }}",
+              "type": "string"
+            },
+            {
+              "id": "1d24aa1d-9dbb-4215-bfa3-a51635017e3e",
+              "name": "date_stop",
+              "value": "={{ $json.data[0].date_stop }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3808,
+        1344
+      ],
+      "id": "cf20b958-7a5e-4708-84ee-7a7fbabe7ec2",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2409e878-11e5-4b88-8acf-6a13f8482adf",
+              "leftValue": "={{ $json.date_start }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        3584,
+        1168
+      ],
+      "id": "de2f803c-c4c6-42e9-8605-ebee3701843e",
+      "name": "Filter3"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3760,
+        1696
+      ],
+      "id": "b2cd1cbb-72f5-4d0d-91ce-37c263fdd2c6",
+      "name": "Split Out5"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3984,
+        1696
+      ],
+      "id": "61e477f1-2f0c-4a07-aa00-a7b48c6472aa",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d35d80b2-d1c3-4f59-913e-bad238ccf0d0",
+              "name": "campaign_id",
+              "value": "={{ $('Split Out5').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "646457b6-590e-4ea4-875e-2caa724f51f7",
+              "name": "campaign_name",
+              "value": "={{ $('Split Out5').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "35fedc82-8276-4fd5-bac3-5c42fcbc343d",
+              "name": "spend",
+              "value": "={{ $json.data[0].spend }}",
+              "type": "string"
+            },
+            {
+              "id": "fb95dcbd-cbbe-47b5-a2a0-f7b2863ce243",
+              "name": "impressions",
+              "value": "={{ $json.data[0].impressions }}",
+              "type": "string"
+            },
+            {
+              "id": "13cc352c-cd73-492d-84d1-839c22256feb",
+              "name": "clicks",
+              "value": "={{ $json.data[0].clicks }}",
+              "type": "string"
+            },
+            {
+              "id": "d0c6d2ff-3835-4b34-831e-a8b5a168a38a",
+              "name": "account_id",
+              "value": "={{ $('Split Out5').item.json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "11d74e43-f288-49e4-a09d-94c8f0a838c1",
+              "name": "date_start",
+              "value": "={{ $json.data[0].date_start }}",
+              "type": "string"
+            },
+            {
+              "id": "1d24aa1d-9dbb-4215-bfa3-a51635017e3e",
+              "name": "date_stop",
+              "value": "={{ $json.data[0].date_stop }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4432,
+        1840
+      ],
+      "id": "f2c9c3b4-7b7c-4517-a127-1c0655921e27",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2409e878-11e5-4b88-8acf-6a13f8482adf",
+              "leftValue": "={{ $json.date_start }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        4208,
+        1680
+      ],
+      "id": "d88783e3-ed17-4ad7-9917-afcabc465786",
+      "name": "Filter4"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v20.0/act_1222178640103263/campaigns",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "name,account_id"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $json.Token }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2912,
+        1184
+      ],
+      "id": "8c99663e-58e3-4a0e-9844-64bae30bc0b9",
+      "name": "Target act_id",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v20.0/{{ $json.id }}/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "campaign_id,campaign_name,date_start,spend,impressions,clicks"
+            },
+            {
+              "name": "date_preset",
+              "value": "maximum"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Check token expiration date').item.json.Token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3584,
+        1344
+      ],
+      "id": "968c21dc-3740-4716-9f0a-6a6adae76087",
+      "name": "Get insights",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v20.0/{{ $json.id }}/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "campaign_id,campaign_name,date_start,spend,impressions,clicks"
+            },
+            {
+              "name": "date_preset",
+              "value": "maximum"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Update token').item.json.Token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4208,
+        1840
+      ],
+      "id": "9ec3f9ac-205f-4a3b-937b-167ab09f66f0",
+      "name": "Get insights1"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v20.0/act_1222178640103263/campaigns",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "name,account_id"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $json.Token }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3536,
+        1696
+      ],
+      "id": "46ab7463-0180-4fbd-9d02-a40eb99cfc8e",
+      "name": "Target act_id1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4640,
+        1840
+      ],
+      "id": "1e26de5a-506e-42f5-9cd9-f09e8f9d9b10",
+      "name": "Delay",
+      "webhookId": "b7dbd202-4207-4547-8979-a743dc75821b"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4032,
+        1344
+      ],
+      "id": "2c79c48d-083d-4a67-813a-565486a58e8a",
+      "name": "Delay1",
+      "webhookId": "b7dbd202-4207-4547-8979-a743dc75821b"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "meta_ads_campaign_insights",
+          "mode": "list",
+          "cachedResultName": "meta_ads_campaign_insights"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "spend": "={{ $json.spend }}",
+            "impressions": "={{ $json.impressions }}",
+            "clicks": "={{ $json.clicks }}",
+            "campaign_id": "={{ $json.campaign_id }}",
+            "campaign_name": "={{ $json.campaign_name }}",
+            "account_id": "={{ $json.account_id }}",
+            "date_start": "={{ $json.date_start }}",
+            "date_stop": "={{ $json.date_stop }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "campaign_id",
+              "displayName": "campaign_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "campaign_name",
+              "displayName": "campaign_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "spend",
+              "displayName": "spend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "impressions",
+              "displayName": "impressions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clicks",
+              "displayName": "clicks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "account_id",
+              "displayName": "account_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_start",
+              "displayName": "date_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_stop",
+              "displayName": "date_stop",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_added",
+              "displayName": "date_added",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        3808,
+        1168
+      ],
+      "id": "b336bf57-7464-4b3e-9524-eb76580f75d5",
+      "name": "Add to database1",
+      "credentials": {
+        "postgres": {
+          "id": "705f6HFlnUytjJ4R",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "meta_ads_campaign_insights",
+          "mode": "list",
+          "cachedResultName": "meta_ads_campaign_insights"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "spend": "={{ $json.spend }}",
+            "impressions": "={{ $json.impressions }}",
+            "clicks": "={{ $json.clicks }}",
+            "campaign_id": "={{ $json.campaign_id }}",
+            "campaign_name": "={{ $json.campaign_name }}",
+            "account_id": "={{ $json.account_id }}",
+            "date_start": "={{ $json.date_start }}",
+            "date_stop": "={{ $json.date_stop }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "campaign_id",
+              "displayName": "campaign_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "campaign_name",
+              "displayName": "campaign_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "spend",
+              "displayName": "spend",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "impressions",
+              "displayName": "impressions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clicks",
+              "displayName": "clicks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "account_id",
+              "displayName": "account_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_start",
+              "displayName": "date_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_stop",
+              "displayName": "date_stop",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_added",
+              "displayName": "date_added",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        4432,
+        1680
+      ],
+      "id": "a41ecec5-f259-41f6-b3d4-7909a0c00a67",
+      "name": "Add to database2",
+      "credentials": {
+        "postgres": {
+          "id": "705f6HFlnUytjJ4R",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Using HTTP Request Node - step 2\n",
+        "height": 944,
+        "width": 2656,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2176,
+        1120
+      ],
+      "typeVersion": 1,
+      "id": "669591e3-4aa0-48b6-a665-784c79a1d6c5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Using Facebook Graph API Node\n",
+        "height": 672,
+        "width": 2656,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2176,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "287fec35-a103-49f7-8047-c74e55b07111",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "# Workflow Overall Process\n\n## 1. Observe Specific Ad Account ID\nThis workflow retrieves campaigns only from ad account `act_1222178640101234`.\nMultiple ad accounts can be monitored, but this example uses only one.\n\n## 2. Get Campaign List Under Ad Account ID\nAn API request fetches the campaigns under the selected ad account,\nincluding campaign_name and campaign_id.\n\n## 3. Get Insights / Metrics for Each Campaign\nA looped API request collects performance metrics for each campaign,\nsuch as `spend, impressions, clicks, date_start, date_stop,` and others if needed.\n\n## 4. Handle Null Insight and Metric Values\nA Filter node removes campaigns where date_start is null,\nmeaning the campaign has not been published yet or the data is not available.\n\ncampaign with null example:\n\n\n  `{`\n    `\"campaign_id\": \"120242418331871234\",`\n    `\"campaign_name\": \"Campaign with null Insights\",`\n    `\"spend\": null,`\n   `\"impressions\": null,`\n    `\"clicks\": null,`\n    `\"date_start\": null,`\n    `\"date_stop\": null`\n ` }`\n\n\n## 5. Append to PostgreSQL Database (Hosted by Supabase)\nAfter gathering and cleaning the data, the final node runs an SQL query\nto append the results to the existing PostgreSQL table.\n\nPostgreSQL Table Fields:\nid = Primary key used to uniquely identify each appended record.\ndate_added = Timestamp indicating when the record was inserted into the database.\neg\n\n\n`{`\n  `\"id\": 1,`                                                                    \n  `\"campaign_id\": \"120242330236641234\",`\n  `\"campaign_name\": \"Learn Python with our Course\",`\n  `\"spend\": \"107.14\",`\n  `\"impressions\": \"13159\",`\n  `\"clicks\": \"10\",`\n  `\"account_id\": \"1222178640103263\",`\n  `\"date_start\": \"2026-02-07\",`\n  `\"date_stop\": \"2026-02-09\",`\n  `\"date_added\": \"2026-02-09T10:50:15Z\"`        \n`}`\n \n",
+        "height": 1216,
+        "width": 1616,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "6d057b23-b7a7-41ea-9a37-95e2859f18fe",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "graphApiVersion": "v20.0",
+        "node": "act_1222178640103263/campaigns?fields=name,account_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        304
+      ],
+      "id": "30e3abaa-6c7c-40d1-a43f-607a27fdae76",
+      "name": "Target act_id2",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "yvxFrIUIdqX3fciD",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "graphApiVersion": "v20.0",
+        "node": "={{ $('Split Out3').item.json.id }}",
+        "edge": "=insights",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "fields",
+                "value": "campaign_id, campaign_name, date_start, spend, impressions, clicks"
+              },
+              {
+                "name": "date_preset",
+                "value": "maximum"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        464
+      ],
+      "id": "dff209dc-59f5-4b7f-93ea-71deab8e1815",
+      "name": "Get insights2",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "yvxFrIUIdqX3fciD",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\n # [n8n Workflow Explanation (Loom Part 1)]( https://www.loom.com/share/170d86ba8c9a4899869215e9bfe1bf04 )\n\n # [n8n Workflow Testing (Loom Part 2)]( https://www.loom.com/share/4d53b8c0847240958aa3ab4c19d4556b )",
+        "height": 192,
+        "width": 1616
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "29171fae-9bb1-4460-8256-5784d5e35873",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Two Methods to call Meta API\n\n# 1. Using Facebook Graph API Node\nThe simplest method to connect a Facebook account:\nAdd credentials → Generate token → Paste token → Account connected.\nHowever, it is uncertain whether this node automatically refreshes the token\nafter the 60-day expiration period.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# 2. Using HTTP Request Node\nThis method handles token expiration manually.\nThe access token and its expiration date are stored in a database table,\nallowing the workflow to automatically generate and update a new token when needed.\nA table named `Meta_credential` must be created first for storing these values.\n",
+        "height": 1344,
+        "width": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1664,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "dad84f1e-26d7-42e1-ac1b-9cf23ad01193",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {
+    "My Token": [
+      {
+        "json": {
+          "Token": "EAAbkt5guTV4BQgD2CZC5e5pCeRVkcPbjUZBxKP0ZBCNZCxZBL3dF7ofKOTPdhzIxJNE3xiViCrtBCq3i76aOMXviV8Ujc0IKmlv1qEuzph88gwyxZCZAG7JNbaIfTCTVpPfEyWDTOZCMWnFvPyiQZASbZAL03hxFK1LjuEgdBrsZC8VF2shCAWbrtKe6clZA1bzH",
+          "expires_at": "2026-04-06T17:17:54.610Z"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger4": {
+      "main": [
+        [
+          {
+            "node": "Check token expiration date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Table": {
+      "main": [
+        [
+          {
+            "node": "My Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Table1": {
+      "main": [
+        [
+          {
+            "node": "Update Record3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reniew token (60 days)": {
+      "main": [
+        [
+          {
+            "node": "Token generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "My Token": {
+      "main": [
+        [
+          {
+            "node": "Create Table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token generated": {
+      "main": [
+        [
+          {
+            "node": "Update token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update token": {
+      "main": [
+        [
+          {
+            "node": "Target act_id1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token expired": {
+      "main": [
+        [
+          {
+            "node": "Target act_id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reniew token (60 days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check token expiration date": {
+      "main": [
+        [
+          {
+            "node": "Token expired",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger5": {
+      "main": [
+        [
+          {
+            "node": "Target act_id2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Filter2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get insights2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter2": {
+      "main": [
+        [
+          {
+            "node": "Add to database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Filter3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Delay1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter3": {
+      "main": [
+        [
+          {
+            "node": "Add to database1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Filter4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get insights1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Delay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter4": {
+      "main": [
+        [
+          {
+            "node": "Add to database2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Target act_id": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get insights": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get insights1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Target act_id1": {
+      "main": [
+        [
+          {
+            "node": "Split Out5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delay": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delay1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Target act_id2": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get insights2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "a9a7ce18-0d1f-4a48-a66c-9f8b6c2743c7",
+  "meta": {
+    "instanceId": "0b784ba6be39a0143295d31f4f795e3354fe39b63e56e29566e85d3f80f34607"
+  },
+  "id": "cAL82XwF9qCsDbZZNqQG6",
+  "tags": []
+}
